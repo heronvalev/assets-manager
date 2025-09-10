@@ -15,7 +15,26 @@ class Asset(models.Model):
         return f"{self.name} ({self.serial_number})"
     
     def is_assigned(self):
+        """
+        Returns True if the asset is currently assigned to a user 
+        (it has at least one Assignment without a returned_date).
+        Otherwise returns False.
+        """
         return self.assignments.filter(returned_date__isnull=True).exists()
+    
+    def get_current_location(self):
+        """
+        Returns the asset's current location:
+        - If the asset is assigned, returns the location from the active Assignment.
+        - If unassigned, returns the location stored in the Asset table.
+        """
+        active_assignment = self.assignments.filter(returned_date__isnull=True).first()
+
+        if active_assignment:
+            return active_assignment.location
+        
+        return self.location
+        
     
 class Assignment(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name="assignments")
@@ -23,6 +42,7 @@ class Assignment(models.Model):
     assigned_upn = models.EmailField(blank=True, null=True)
     assigned_date = models.DateField(auto_now_add=True)
     returned_date = models.DateField(blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True)
     assignment_reason = models.CharField(max_length=100, blank=True)
     notes = models.TextField(blank=True)
 
