@@ -1,5 +1,17 @@
 from django.db import models
 
+
+class EntraUser(models.Model):
+    entra_user_id = models.CharField(max_length=36, unique=True)
+    display_name = models.CharField(max_length=100, blank=True)
+    upn = models.EmailField(unique=True)
+    is_active = models.BooleanField(default=True)
+    department = models.CharField(max_length=50, blank=True)
+
+    def __str__(self):
+        return f"{self.display_name} ({self.upn})"
+    
+    
 class Asset(models.Model):
     name = models.CharField(max_length=100)
     category = models.CharField(max_length=50, blank=True)
@@ -38,8 +50,7 @@ class Asset(models.Model):
     
 class Assignment(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name="assignments")
-    entra_user_id = models.CharField(max_length=36)
-    assigned_upn = models.EmailField(blank=True, null=True)
+    entra_user = models.ForeignKey(EntraUser, null=True, blank=True, on_delete=models.SET_NULL, related_name="assignments")
     assigned_date = models.DateField(auto_now_add=True)
     returned_date = models.DateField(blank=True, null=True)
     location = models.CharField(max_length=100, blank=True)
@@ -47,7 +58,9 @@ class Assignment(models.Model):
     notes = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.asset.name} -> {self.assigned_upn or 'Unassigned'}"
+        return f"{self.asset.name} -> {self.entra_user.display_name if self.entra_user else 'Unassigned'}"
+
     
     def is_active(self):
         return self.returned_date is None
+
