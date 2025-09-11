@@ -1,6 +1,6 @@
 from django.db import models
 
-
+# Entra Users table to sync with Microsoft Graph API
 class EntraUser(models.Model):
     entra_user_id = models.CharField(max_length=36, unique=True)
     display_name = models.CharField(max_length=100, blank=True)
@@ -11,7 +11,7 @@ class EntraUser(models.Model):
     def __str__(self):
         return f"{self.display_name} ({self.upn})"
     
-    
+# Assets table for all assets/devices    
 class Asset(models.Model):
     name = models.CharField(max_length=100)
     category = models.CharField(max_length=50, blank=True)
@@ -47,7 +47,7 @@ class Asset(models.Model):
         
         return self.location
         
-    
+# Assignments table to track current and historical asset assignment    
 class Assignment(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name="assignments")
     entra_user = models.ForeignKey(EntraUser, null=True, blank=True, on_delete=models.SET_NULL, related_name="assignments")
@@ -62,5 +62,8 @@ class Assignment(models.Model):
 
     
     def is_active(self):
+        """
+        Returns True if there is no returned_date value
+        """
         return self.returned_date is None
 
