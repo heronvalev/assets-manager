@@ -30,33 +30,48 @@ def get_access_token():
     token = credential.get_token(*SCOPES)
     return token.token
 
-def get_user(upn: str):
+def get_all_users():
     """
-    Query Microsoft Graph for a user upn(email) and return their properties as a dictionary.
+    Query Microsoft Graph API for all users and return a list of dictionaries for each user.
     """
-
-    # Get an access token
+    # Acquire access token
     token = get_access_token()
 
-    # Microsoft Graph endpoint for a single user
-    url = f"https://graph.microsoft.com/v1.0/users/{upn}"
+    # API endpoint
+    url = "https://graph.microsoft.com/v1.0/users"
 
-    # Authentication
+    params = {
+    "$select": "id,displayName,userPrincipalName,department,accountEnabled"
+    }
+
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json"
     }
 
-    # Make the get request
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        
-    except RequestException as e:
-        raise e
+    # List of users(dictionaries)
+    all_users = []
 
-    data = response.json()
-    if not data:
-        raise ValueError(f"Empty response for user {upn}")
+    # Handle pagination if any
+    while url:
 
-    return data
+        try:
+            response = requests.get(
+                url,
+                headers=headers, 
+                params=params if not all_users else None
+            )
+            
+            response.raise_for_status()
+        except RequestException as e:
+            raise e
+
+        data = response.json()
+        users = data.get("value", [])
+        all_users.extend(users)
+
+        # Get the URL for the next page, or None if there isn’t one
+        url = data.get("@odata.nextLink")
+
+    return all_users
+
