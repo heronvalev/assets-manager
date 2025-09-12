@@ -16,8 +16,8 @@ class Command(BaseCommand):
         for user_data in users:
             entra_user_id = user_data.get("id")
             upn = user_data.get("userPrincipalName")
-            display_name = user_data.get("displayName", "Unavailable")
-            department = user_data.get("department", "Unavailable")
+            display_name = user_data.get("displayName") or "None"
+            department = user_data.get("department") or "None"
             is_active = user_data.get("accountEnabled")
 
             # Update or create the user in the DB

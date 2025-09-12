@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Entra Users table to sync with Microsoft Graph API
 class EntraUser(models.Model):
@@ -51,7 +52,7 @@ class Asset(models.Model):
 class Assignment(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name="assignments")
     entra_user = models.ForeignKey(EntraUser, null=True, blank=True, on_delete=models.SET_NULL, related_name="assignments")
-    assigned_date = models.DateField(auto_now_add=True)
+    assigned_date = models.DateField(default=timezone.now)
     returned_date = models.DateField(blank=True, null=True)
     location = models.CharField(max_length=100, blank=True)
     assignment_reason = models.CharField(max_length=100, blank=True)
