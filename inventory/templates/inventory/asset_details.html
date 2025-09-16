@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ asset.name }} Details{% endblock %}
+
+{% block content %}
+<h2>{{ asset.name }} ({{ asset.serial_number }})</h2>
+
+<ul>
+    <li>Category: {{ asset.category }}</li>
+    <li>Brand: {{ asset.brand }}</li>
+    <li>Model: {{ asset.model }}</li>
+    <li>Status: {{ asset.status }}</li>
+    <li>Location: {{ asset.get_current_location }}</li>
+    <li>Notes: {{ asset.notes }}</li>
+</ul>
+
+<h3>Assignments</h3>
+<table class="table table-bordered table-striped align-middle">
+    <thead class="table-header">
+        <tr>
+            <th>User / Team</th>
+            <th>Assigned Date</th>
+            <th>Returned Date</th>
+            <th>Location</th>
+            <th>Reason</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for assignment in assignments %}
+        <tr>
+            
+            <td>
+                {% if assignment.entra_user %}
+                    {{ assignment.entra_user.upn }}
+                {% else %}
+                    Team/Room
+                {% endif %}
+            </td>
+
+            <td>{{ assignment.assigned_date }}</td>
+            <td>{{ assignment.returned_date|default:"-" }}</td>
+            <td>{{ assignment.location }}</td>
+            <td>{{ assignment.assignment_reason }}</td>
+            <td>{{ assignment.notes }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No assignments found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

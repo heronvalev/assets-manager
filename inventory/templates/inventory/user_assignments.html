@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.display_name }} Assignments{% endblock %}
+
+{% block content %}
+<h2>User Details</h2>
+<div class="card mb-4">
+    <div class="card-body">
+        <p><strong>Display Name:</strong> {{ user.display_name }}</p>
+        <p><strong>UPN:</strong> {{ user.upn }}</p>
+        <p><strong>Department:</strong> {{ user.department|default:"-" }}</p>
+        <p><strong>Active:</strong> {{ user.is_active }}</p>
+    </div>
+</div>
+
+<h2>Assignments</h2>
+<table class="table table-bordered table-striped align-middle">
+    <thead class="table-header">
+        <tr>
+            <th>Asset</th>
+            <th>Assigned Date</th>
+            <th>Returned Date</th>
+            <th>Location</th>
+            <th>Reason</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for assignment in assignments %}
+        <tr>
+            <td>
+                <a href="{% url 'asset_details' assignment.asset.id %}">
+                    {{ assignment.asset.name }}
+                </a>
+            </td>
+            <td>{{ assignment.assigned_date }}</td>
+            <td>{{ assignment.returned_date|default:"-" }}</td>
+            <td>{{ assignment.location }}</td>
+            <td>{{ assignment.assignment_reason }}</td>
+            <td>{{ assignment.notes }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No assignments found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

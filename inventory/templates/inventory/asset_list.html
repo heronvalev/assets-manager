@@ -24,7 +24,10 @@
         <tbody>
             {% for asset in assets %}
             <tr>
-                <td>{{ asset.name }}</td>
+                <td>
+                    <a href="{% url 'asset_details' asset.id %}">{{ asset.name }}</a>
+                </td>
+
                 <td>{{ asset.category }}</td>
                 <td>{{ asset.brand }}</td>
                 <td>{{ asset.model }}</td>
@@ -33,7 +36,20 @@
                 <td>{{ asset.status }}</td>
                 <td>{{ asset.location }}</td>
                 <td>{{ asset.notes }}</td>
-                <td>{{ asset.get_current_user_upn }}</td>
+                <td>
+                    {% if asset.is_assigned %}
+                        {% if asset.get_current_user %}
+                            <a href="{% url 'user_assignments' asset.get_current_user.id %}">
+                                {{ asset.get_current_user.upn }}
+                            </a>
+                        {% else %}
+                        Team/Room
+                        {% endif %}
+                    {% else %}
+                        Available
+                    {% endif %}
+                </td>
+
                 <td>{{ asset.get_current_location }}</td>
             </tr>
             {% empty %}

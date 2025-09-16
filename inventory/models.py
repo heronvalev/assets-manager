@@ -47,15 +47,15 @@ class Asset(models.Model):
             return active_assignment.location
         
         return self.location
-    
-    def get_current_user_upn(self):
+ 
+    def get_current_user(self):
         """
-        Returns the UPN of the user currently assigned to this asset, or None if unassigned.
+        Returns the EntraUser object currently assigned, or None.
         """
         active_assignment = self.assignments.filter(returned_date__isnull=True).first()
         if active_assignment:
-            return active_assignment.entra_user.upn if active_assignment.entra_user else "Team/Room"
-        return "Available"
+            return active_assignment.entra_user
+        return None
         
 # Assignments table to track current and historical asset assignment    
 class Assignment(models.Model):

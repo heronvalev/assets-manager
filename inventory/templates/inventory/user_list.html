@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}All Users{% endblock %}
+
+{% block content %}
+<h2>All Users</h2>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-header">
+            <tr>
+                <th>Display Name</th>
+                <th>UPN</th>
+                <th>Department</th>
+                <th>Active</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>
+                    <a href="{% url 'user_assignments' user.id %}">
+                        {{ user.display_name }}
+                    </a>
+                </td>
+                <td>{{ user.upn }}</td>
+                <td>{{ user.department }}</td>
+                <td>{{ user.is_active|yesno:"Yes,No" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No users found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
