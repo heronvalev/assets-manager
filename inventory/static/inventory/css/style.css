@@ -1,0 +1,10 @@
+.asset-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.asset-table, 
+.asset-table th, 
+.asset-table td {
+    border: 1px solid black;
+}
