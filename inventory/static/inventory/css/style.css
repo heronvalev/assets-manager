@@ -1,10 +1,94 @@
-.asset-table {
-    border-collapse: collapse;
-    width: 100%;
+/* Body / global background and font */
+body {
+    background-color: #F5E9D4;
+    color: #5C3A21;
+    font-family: Arial, sans-serif;
 }
 
-.asset-table, 
-.asset-table th, 
-.asset-table td {
-    border: 1px solid black;
+/* Navbar */
+header {
+    background-color: #8B5E3C;
+}
+
+/* Navbar links */
+header .nav-link {
+    color: #F5E9D4;
+}
+
+header .nav-link:hover {
+    color: #D2B48C;
+}
+
+/* Buttons (primary and outline) */
+.btn-primary {
+    background-color: #A67C52;
+    border-color: #A67C52;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #8B5E3C;
+    border-color: #8B5E3C;
+}
+
+.btn-outline-light {
+    color: #F5E9D4;
+    border-color: #F5E9D4;
+}
+
+.btn-outline-light:hover {
+    background-color: #F5E9D4;
+    color: #8B5E3C;
+}
+
+/* Search input styling */
+form input[type="search"] {
+    background-color: #F5E9D4;
+    color: #5C3A21;
+    border: 1px solid #8B5E3C;
+}
+
+/* Placeholder text color */
+form input[type="search"]::placeholder {
+    color: #8B5E3C;
+    opacity: 1;
+}
+
+/* Focus effect */
+form input[type="search"]:focus {
+    background-color: #F5E9D4;
+    color: #5C3A21;
+    border-color: #A67C52;
+    box-shadow: none;
+}
+
+/* Tables */
+.table {
+    background-color: #fff;
+    color: #5C3A21;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+/* Table header */
+.table thead th {
+    background-color: #8B5E3C;
+    color: #F5E9D4;
+    text-align: center;
+    border-bottom: 2px solid #5C3A21;
+}
+
+/* Table cells */
+.table th,
+.table td {
+    border-bottom: 1px solid #D2B48C;
+    border-right: 1px solid #D2B48C;
+}
+
+/* Remove right border on last cell */
+.table th:last-child,
+.table td:last-child {
+    border-right: none;
 }
