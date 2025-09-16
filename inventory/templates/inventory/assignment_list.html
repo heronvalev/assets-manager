@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Assignments{% endblock %}
+
+{% block content %}
+<h2>Assignments</h2>
+<div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-header">
+            <tr>
+                <th>Asset</th>
+                <th>User / Team</th>
+                <th>Assigned Date</th>
+                <th>Returned Date</th>
+                <th>Location</th>
+                <th>Reason</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for assignment in assignments %}
+            <tr>
+                <td>{{ assignment.asset.name }}</td>
+
+                <td>
+                    {% if assignment.entra_user %}
+                        {{ assignment.entra_user.upn }}
+                    {% else %}
+                        Team/Room
+                    {% endif %}
+                </td>
+                
+                <td>{{ assignment.assigned_date }}</td>
+                <td>{{ assignment.returned_date|default:"-" }}</td>
+                <td>{{ assignment.location }}</td>
+                <td>{{ assignment.assignment_reason }}</td>
+                <td>{{ assignment.notes }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">No assignments found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
