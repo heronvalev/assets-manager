@@ -3,9 +3,9 @@ from .models import EntraUser, Asset, Assignment
 
 @admin.register(EntraUser)
 class EntraUserAdmin(admin.ModelAdmin):
-    list_display = ('display_name', 'upn', 'department', 'is_active')
+    list_display = ('display_name', 'upn', 'department', 'is_active', 'deleted_at')
     search_fields = ('display_name', 'upn')
-    list_filter = ('is_active', 'department')
+    list_filter = ('is_active', 'department', 'deleted_at')
 
 @admin.register(Asset)
 class AssetAdmin(admin.ModelAdmin):

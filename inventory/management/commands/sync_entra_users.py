@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 from inventory.models import EntraUser
 from inventory.graph_api import get_all_users
 
@@ -28,14 +29,19 @@ class Command(BaseCommand):
                     "display_name": display_name,
                     "department": department,
                     "is_active": is_active,
+                    "deleted_at": None,
                     }
             )
 
         # Get the set of EntraUser IDs returned from Microsoft Graph
         current_ids = {user_data["id"] for user_data in users}
 
-        # Delete any EntraUser objects not in current_ids
-        EntraUser.objects.exclude(entra_user_id__in=current_ids).delete()
-
+        
+        # Mark users missing from Graph as deleted (soft delete)
+        for user in EntraUser.objects.exclude(entra_user_id__in=current_ids):
+            if user.deleted_at is None:  # only stamp once
+                user.deleted_at = timezone.now()
+            user.is_active = False
+            user.save()
 
         self.stdout.write(self.style.SUCCESS("Entra users synced successfully."))

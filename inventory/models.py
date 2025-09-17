@@ -8,6 +8,7 @@ class EntraUser(models.Model):
     upn = models.EmailField(unique=True)
     is_active = models.BooleanField(default=True)
     department = models.CharField(max_length=50, blank=True)
+    deleted_at = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.display_name} ({self.upn})"
