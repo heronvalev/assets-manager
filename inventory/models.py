@@ -15,13 +15,30 @@ class EntraUser(models.Model):
     
 # Assets table for all assets/devices    
 class Asset(models.Model):
+
+    STATUS_OPERATIONAL = "Operational"
+    STATUS_MAINTENANCE = "Maintenance"
+    STATUS_DECOMMISSIONED = "Decommissioned"
+    STATUS_LOST = "Lost/Damaged"
+    STATUS_PENDING = "Pending Setup"
+    STATUS_RESERVED = "Reserved"
+
+    STATUS_CHOICES = [
+        (STATUS_OPERATIONAL, "Operational"),
+        (STATUS_MAINTENANCE, "Maintenance"),
+        (STATUS_DECOMMISSIONED, "Decommissioned"),
+        (STATUS_LOST, "Lost/Damaged"),
+        (STATUS_PENDING, "Pending Setup"),
+        (STATUS_RESERVED, "Reserved"),
+    ]
+
     name = models.CharField(max_length=100)
     category = models.CharField(max_length=50, blank=True)
     brand = models.CharField(max_length=50, blank=True)
     model = models.CharField(max_length=50, blank=True)
     serial_number = models.CharField(max_length=100, unique=True)
     purchase_date = models.DateField(blank=True, null=True)
-    status = models.CharField(max_length=20, default="active")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_OPERATIONAL)
     location = models.CharField(max_length=100, blank=True)
     notes = models.TextField(blank=True)
 

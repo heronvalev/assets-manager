@@ -1,5 +1,6 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Asset, Assignment, EntraUser
+from .forms import AssetForm
 
 # All assets page
 def asset_list(request):
@@ -64,3 +65,23 @@ def user_list(request):
         'users': users
     }
     return render(request, 'inventory/user_list.html', context)
+
+# Add an asset page
+def create_asset(request):
+    """
+    Handles the creation of a new Asset.
+    
+    GET: Displays an empty AssetForm.
+    POST: Validates and saves the form, then redirects to the asset list.
+    """
+    if request.method == "POST":
+
+        form = AssetForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('asset_list')
+        
+    else:
+        form = AssetForm()
+    
+    return render(request, 'inventory/asset_form.html', {'form': form})
