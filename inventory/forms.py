@@ -28,4 +28,38 @@ class AssetForm(forms.ModelForm):
             'location': forms.TextInput(attrs={'class': 'form-control'}),
             'notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
         }
-        
+
+# Assignment Create form
+class AssignmentForm(forms.ModelForm):
+    class Meta:
+        model = Assignment
+        fields = [
+            'asset',
+            'entra_user',
+            'assigned_date',
+            'location',
+            'assignment_reason',
+            'notes'
+        ]
+        widgets = {
+            'assigned_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'assignment_reason': forms.TextInput(attrs={'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'class': 'form-control'}),
+            'asset': forms.Select(attrs={'class': 'form-select'}),
+            'entra_user': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+# Assignment edit form page
+class AssignmentEditForm(forms.ModelForm):
+    class Meta:
+        model = Assignment
+
+        # Only some editable fields
+        fields = ['returned_date', 'location', 'notes']
+
+        widgets = {
+            'returned_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'class': 'form-control'}),
+            'notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+        }

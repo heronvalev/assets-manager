@@ -9,4 +9,7 @@ urlpatterns = [
     path('users/', views.user_list, name='user_list'),
     path('assets/add/', views.create_asset, name='create_asset'),
     path('assets/<int:asset_id>/edit/', views.edit_asset, name='edit_asset'),
+    path('assignments/add/', views.create_assignment, name='create_assignment'),
+    path('assignments/<int:assignment_id>/edit/', views.edit_assignment, name='edit_assignment')
+
 ]

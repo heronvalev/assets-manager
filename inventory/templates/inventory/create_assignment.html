@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if edit %}
+        Edit Assignment
+    {% else %}
+        Add Assignment
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">
+        {% if edit %}Edit Assignment{% else %}Add New Assignment{% endif %}
+    </h2>
+
+    <form method="post" class="row g-3">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="col-md-6">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+
+                {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">
+
+                {% if edit %}
+                    Update Assignment
+                {% else %}
+                    Save Assignment
+                {% endif %}
+
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

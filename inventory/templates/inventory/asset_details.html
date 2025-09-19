@@ -5,8 +5,17 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>{{ asset.name }} ({{ asset.serial_number }})</h2>
-    <a href="{% url 'edit_asset' asset.id %}" class="btn btn-primary mb-3">Edit</a>
+    <a href="{% url 'edit_asset' asset.id %}" class="btn btn-primary">Edit</a>
 </div>
+
+{% if not asset.is_assigned %}
+    <a href="{% url 'create_assignment' %}?asset_id={{ asset.id }}" class="btn btn-primary mb-3">Assign</a>
+{% else %}
+    <span class="mb-3 d-block" style="color: #6c757d;">Currently assigned</span>
+    {% if active_assignment %}
+        <a href="{% url 'edit_assignment' active_assignment.id %}" class="btn btn-primary mb-3">Update Assignment</a>
+    {% endif %}
+{% endif %}
 
 
 <ul>

@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Asset, Assignment, EntraUser
-from .forms import AssetForm
+from .forms import AssetForm, AssignmentForm, AssignmentEditForm
 
 # All assets page
 def asset_list(request):
@@ -32,12 +32,15 @@ def asset_details(request, asset_id):
     Display details for a single asset, including current and past assignments.
     """
     asset = get_object_or_404(Asset, id=asset_id)
+    active_assignment = asset.assignments.filter(returned_date__isnull=True).first()
     assignments = asset.assignments.select_related('entra_user').order_by('-assigned_date')
 
     context = {
         'asset': asset,
-        'assignments': assignments
+        'assignments': assignments,
+        'active_assignment': active_assignment
     }
+    
     return render(request, 'inventory/asset_details.html', context)
 
 # Single user details & assignments
@@ -104,3 +107,39 @@ def edit_asset(request, asset_id):
         form = AssetForm(instance=asset)
     
     return render(request, 'inventory/asset_form.html', {'form': form, 'edit': True})
+
+# Create assignment form page
+def create_assignment(request):
+    asset_id = request.GET.get('asset_id')
+    
+    if request.method == "POST":
+        form = AssignmentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('assignment_list')
+    else:
+        initial = {}
+        if asset_id:
+            initial['asset'] = asset_id
+        form = AssignmentForm(initial=initial)
+    
+    return render(request, 'inventory/create_assignment.html', {'form': form})
+
+# Edit an assignment
+def edit_assignment(request, assignment_id):
+    """
+    Edit an existing assignment (limited fields for historical integrity).
+    """
+    assignment = get_object_or_404(Assignment, id=assignment_id)
+
+    if request.method == "POST":
+        form = AssignmentEditForm(request.POST, instance=assignment)
+        if form.is_valid():
+            form.save()
+            return redirect('assignment_list')
+        
+    else:
+        form = AssignmentEditForm(instance=assignment)
+
+    return render(request, 'inventory/create_assignment.html', {'form': form, 'edit': True})
+
