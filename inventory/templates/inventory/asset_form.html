@@ -1,10 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}Add Asset{% endblock %}
+{% block title %}
+    {% if edit %}
+        Edit Asset
+    {% else %}
+        Add Asset
+    {% endif %}    
+{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2 class="mb-4">Add New Asset</h2>
+
+    <h2 class="mb-4">
+        {% if edit %}
+            Edit Asset
+        {% else %}
+            Add New Asset
+        {% endif %}
+    </h2>
 
     <form method="post" class="row g-3">
         {% csrf_token %}
@@ -24,7 +37,15 @@
         {% endfor %}
 
         <div class="col-12">
-            <button type="submit" class="btn btn-primary">Save Asset</button>
+            
+            <button type="submit" class="btn btn-primary">
+                {% if edit %}
+                    Save Changes
+                {% else %}
+                    Add Asset
+                {% endif %}
+            </button>
+
         </div>
     </form>
 </div>

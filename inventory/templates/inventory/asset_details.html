@@ -3,7 +3,11 @@
 {% block title %}{{ asset.name }} Details{% endblock %}
 
 {% block content %}
-<h2>{{ asset.name }} ({{ asset.serial_number }})</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>{{ asset.name }} ({{ asset.serial_number }})</h2>
+    <a href="{% url 'edit_asset' asset.id %}" class="btn btn-primary mb-3">Edit</a>
+</div>
+
 
 <ul>
     <li>Category: {{ asset.category }}</li>

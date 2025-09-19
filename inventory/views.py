@@ -66,7 +66,7 @@ def user_list(request):
     }
     return render(request, 'inventory/user_list.html', context)
 
-# Add an asset page
+# Add an asset form page
 def create_asset(request):
     """
     Handles the creation of a new Asset.
@@ -85,3 +85,22 @@ def create_asset(request):
         form = AssetForm()
     
     return render(request, 'inventory/asset_form.html', {'form': form})
+
+# Edit an asset form page
+def edit_asset(request, asset_id):
+    """
+    Edit an existing asset.
+    """
+    asset = get_object_or_404(Asset, id=asset_id)
+
+    if request.method == "POST":
+
+        form = AssetForm(request.POST, instance=asset)
+        if form.is_valid():
+            form.save()
+            return redirect('asset_details', asset_id=asset.id)
+        
+    else:
+        form = AssetForm(instance=asset)
+    
+    return render(request, 'inventory/asset_form.html', {'form': form, 'edit': True})

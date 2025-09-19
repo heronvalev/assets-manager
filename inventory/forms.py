@@ -1,6 +1,7 @@
 from django import forms
-from .models import Asset
+from .models import Asset, Assignment
 
+# Asset Create/Edit form
 class AssetForm(forms.ModelForm):
     class Meta:
         model = Asset
@@ -27,3 +28,4 @@ class AssetForm(forms.ModelForm):
             'location': forms.TextInput(attrs={'class': 'form-control'}),
             'notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
         }
+        
