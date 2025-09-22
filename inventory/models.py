@@ -94,4 +94,36 @@ class Assignment(models.Model):
         Returns True if there is no returned_date value
         """
         return self.returned_date is None
+    
+    def save(self, *args, **kwargs):
+        """
+        Override of the Assignment model's save method.
 
+        Behavior:
+        - Calls the default save() to persist changes to the Assignment.
+        - If a returned_date is being set on an assignment that was previously active,
+          the related Asset's status is automatically updated to 'Maintenance' and saved.
+
+        Args:
+            *args: Positional arguments passed to the base save() method.
+            **kwargs: Keyword arguments passed to the base save() method.
+
+        This ensures asset lifecycle consistency:
+            - Active assignments keep the asset in use.
+            - Once an assignment is closed (returned_date filled), the asset enters
+            'Maintenance' status until IT prepares it for reuse.
+        """
+        if self.pk:  # Check if this assignment already exists in the DB
+
+            old_assignment = Assignment.objects.get(pk=self.pk)
+            was_active = not old_assignment.returned_date
+        else:
+
+            was_active = False  # New objects can’t trigger the status change
+
+        super().save(*args, **kwargs)
+
+        if self.returned_date and was_active:
+
+            self.asset.status = Asset.STATUS_MAINTENANCE
+            self.asset.save()
