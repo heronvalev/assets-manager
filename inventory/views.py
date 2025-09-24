@@ -49,7 +49,7 @@ def user_assignments(request, user_id):
     Display all assignments for a single user.
     """
     user = get_object_or_404(EntraUser, id=user_id)
-    assignments = user.assignments.select_related('asset').order_by('-assigned_date')
+    assignments = user.user_assignments.select_related('asset').order_by('-assigned_date')
 
     context = {
         'user': user,

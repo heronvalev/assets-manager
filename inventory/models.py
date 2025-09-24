@@ -78,7 +78,7 @@ class Asset(models.Model):
 # Assignments table to track current and historical asset assignment    
 class Assignment(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name="assignments")
-    entra_user = models.ForeignKey(EntraUser, null=True, blank=True, on_delete=models.SET_NULL, related_name="assignments")
+    entra_user = models.ForeignKey(EntraUser, null=True, blank=True, on_delete=models.SET_NULL, related_name="user_assignments")
     assigned_date = models.DateField(default=timezone.now)
     returned_date = models.DateField(blank=True, null=True)
     location = models.CharField(max_length=100, blank=True)
@@ -103,15 +103,11 @@ class Assignment(models.Model):
         - Calls the default save() to persist changes to the Assignment.
         - If a returned_date is being set on an assignment that was previously active,
           the related Asset's status is automatically updated to 'Maintenance' and saved.
-
+        - Once an assignment is closed (returned_date filled), the asset enters
+            'Maintenance' status until IT prepares it for reuse.
         Args:
             *args: Positional arguments passed to the base save() method.
-            **kwargs: Keyword arguments passed to the base save() method.
-
-        This ensures asset lifecycle consistency:
-            - Active assignments keep the asset in use.
-            - Once an assignment is closed (returned_date filled), the asset enters
-            'Maintenance' status until IT prepares it for reuse.
+            **kwargs: Keyword arguments passed to the base save() method.  
         """
         if self.pk:  # Check if this assignment already exists in the DB
 
