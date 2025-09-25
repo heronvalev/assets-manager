@@ -1,6 +1,11 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
 from .models import Asset, Assignment, EntraUser
 from .forms import AssetForm, AssignmentForm, AssignmentEditForm
+import msal
+from django.conf import settings
+from django.contrib.auth import login, logout as django_logout
+from django.contrib.auth.models import User
+import requests
 
 # All assets page
 def asset_list(request):
@@ -143,3 +148,73 @@ def edit_assignment(request, assignment_id):
 
     return render(request, 'inventory/create_assignment.html', {'form': form, 'edit': True})
 
+def ms_login(request):
+    # Create an MSAL Confidential Client
+    msal_app = msal.ConfidentialClientApplication(
+        client_id=settings.MICROSOFT_CLIENT_ID,
+        authority=f"https://login.microsoftonline.com/{settings.MICROSOFT_TENANT_ID}",
+        client_credential=settings.MICROSOFT_CLIENT_SECRET,
+    )
+
+    # Build the auth URL
+    auth_url = msal_app.get_authorization_request_url(
+        scopes=["User.Read"],
+        redirect_uri=settings.MICROSOFT_REDIRECT_URI
+    )
+    return redirect(auth_url)
+
+def ms_callback(request):
+    # Get the "code" Microsoft sends back
+    code = request.GET.get("code", None)
+
+    if not code:
+        return render(request, "login_error.html", {"message": "No code returned from Microsoft."})
+
+    # Create MSAL client
+    msal_app = msal.ConfidentialClientApplication(
+        client_id=settings.MICROSOFT_CLIENT_ID,
+        authority=f"https://login.microsoftonline.com/{settings.MICROSOFT_TENANT_ID}",
+        client_credential=settings.MICROSOFT_CLIENT_SECRET,
+    )
+
+    # Exchange the code for tokens
+    token_result = msal_app.acquire_token_by_authorization_code(
+        code,
+        scopes=["User.Read"],
+        redirect_uri=settings.MICROSOFT_REDIRECT_URI,
+    )
+
+    if "access_token" not in token_result:
+        return HttpResponse("Could not acquire token from Microsoft. Please try again.", status=400)
+
+    # Use access token to get user profile from Microsoft Graph
+    graph_response = requests.get(
+        "https://graph.microsoft.com/v1.0/me",
+        headers={"Authorization": f"Bearer {token_result['access_token']}"}
+    )
+
+    user_data = graph_response.json()
+
+    # Get email and name
+    email = user_data.get("mail") or user_data.get("userPrincipalName")
+    name = user_data.get("displayName")
+
+    # Create or get Django user
+    user, created = User.objects.get_or_create(username=email, defaults={"first_name": name})
+
+    # Log the user in
+    login(request, user)
+
+    return redirect("/")
+
+def ms_logout(request):
+    # Log out from Django
+    django_logout(request)
+    
+    # Clear the session completely
+    request.session.flush()
+    
+    # Redirect to Microsoft logout to clear SSO cookies
+    ms_logout_url = f"https://login.microsoftonline.com/{settings.MICROSOFT_TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=http://localhost:8000/login/"
+    
+    return redirect(ms_logout_url)

@@ -11,10 +11,29 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / ".env")
+
+MICROSOFT_CLIENT_ID = os.environ.get("CLIENT_ID")
+MICROSOFT_CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
+MICROSOFT_TENANT_ID = os.environ.get("TENANT_ID")
+
+# Microsoft Identity (MSAL) settings
+MICROSOFT_AUTHORITY = f"https://login.microsoftonline.com/{MICROSOFT_TENANT_ID}"
+
+# Set MSAL permissions
+MICROSOFT_SCOPES = ["User.Read"]
+
+# The redirect path Microsoft will send users back to after login
+MICROSOFT_REDIRECT_PATH = "/callback/"
+
+# Build the full redirect URI
+MICROSOFT_REDIRECT_URI = f"http://localhost:8000{MICROSOFT_REDIRECT_PATH}"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
