@@ -8,18 +8,31 @@
     <link rel="stylesheet" href="{% static 'inventory/css/style.css' %}">
 </head>
 <body>
+    
     <header class="p-3">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
 
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                    <li><a href="{% url 'home' %}" class="nav-link px-2">Home</a></li>
+                    {% if request.user.is_authenticated %}
                     <li><a href="{% url 'asset_list' %}" class="nav-link px-2">Assets</a></li>
                     <li><a href="{% url 'assignment_list' %}" class="nav-link px-2">Assignments</a></li>
                     <li><a href="{% url 'user_list' %}" class="nav-link px-2">Users</a></li>
+                    {% endif %}
                 </ul>
 
-                <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search"> <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search"> </form>
-                <div class="text-end"> <button type="button" class="btn btn-outline-light me-2">Login</button>
+                <!-- <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search"> <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search"> </form> -->
+                
+                <div class="text-end">
+                    <span class="me-2" style="color:#3E2C1A; font-weight:600;">Microsoft Entra ID</span>
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'ms_logout' %}" class="btn btn-outline-light me-2">Log out</a>
+                    {% else %}
+                        <a href="{% url 'ms_login' %}" class="btn btn-outline-light me-2">Log in</a>
+                    {% endif %}
+                </div>
+
             </div>
         </div>
     </header>

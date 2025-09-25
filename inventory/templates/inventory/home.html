@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container text-center" style="margin-top: 15%;">
+    {% if not request.user.is_authenticated %}
+        <h1 class="display-4 fw-bold">Asset Manager</h1>
+        <p class="lead mb-4">Manage your company devices</p>
+        <a href="{% url 'ms_login' %}" class="btn btn-primary btn-lg">Log in to explore</a>
+    {% else %}
+        <h1 class="display-5 mb-4">Welcome back, {{ request.user.first_name|default:request.user.username }}!</h1>
+        <p class="lead">Use the navigation bar to manage assets, assignments, and users.</p>
+
+        <div class="row text-center my-4">
+
+            <div class="col-md-4">
+                <div class="p-4 bg-light rounded shadow">
+                    <h5>Total Assets</h5>
+                    <p class="fs-2 fw-bold">{{ total_assets }}</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-4 bg-light rounded shadow">
+                    <h5>Available Assets</h5>
+                    <p class="fs-2 fw-bold">{{ unassigned_operational }}</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="p-4 bg-light rounded shadow">
+                    <h5>Requires Attention</h5>
+                    <p class="fs-2 fw-bold">{{ need_work }}</p>
+                </div>
+            </div>
+
+        </div>
+
+    {% endif %}
+</div>
+{% endblock %}

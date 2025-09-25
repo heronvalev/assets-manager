@@ -148,6 +148,7 @@ def edit_assignment(request, assignment_id):
 
     return render(request, 'inventory/create_assignment.html', {'form': form, 'edit': True})
 
+# SSO login logic
 def ms_login(request):
     # Create an MSAL Confidential Client
     msal_app = msal.ConfidentialClientApplication(
@@ -163,6 +164,7 @@ def ms_login(request):
     )
     return redirect(auth_url)
 
+# SSO Callback
 def ms_callback(request):
     # Get the "code" Microsoft sends back
     code = request.GET.get("code", None)
@@ -207,6 +209,7 @@ def ms_callback(request):
 
     return redirect("/")
 
+# SSO logout logic
 def ms_logout(request):
     # Log out from Django
     django_logout(request)
@@ -218,3 +221,24 @@ def ms_logout(request):
     ms_logout_url = f"https://login.microsoftonline.com/{settings.MICROSOFT_TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=http://localhost:8000/login/"
     
     return redirect(ms_logout_url)
+
+# Home/Dashboard page
+def home(request):
+
+    total_assets = Asset.objects.count()
+    unassigned_operational = Asset.objects.filter(
+        status='Operational'
+    ).exclude(
+        assignments__returned_date__isnull=True
+    ).count()
+    need_work = Asset.objects.filter(
+        status__in=[Asset.STATUS_MAINTENANCE, Asset.STATUS_PENDING]
+    ).count()
+    
+    context = {
+        'total_assets': total_assets,
+        'unassigned_operational': unassigned_operational,
+        'need_work': need_work
+    }
+    
+    return render(request, 'inventory/home.html', context)
