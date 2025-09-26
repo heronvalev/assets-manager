@@ -7,6 +7,60 @@
     <h2>Assets</h2>
     <a href="{% url 'create_asset' %}" class="btn btn-primary">Add Asset</a>
 </div>
+
+<div class="mb-3">
+    <form method="get" class="row g-3">
+        <!-- Status checkboxes -->
+        <div class="col-auto">
+            <label>Status:</label><br>
+            {% for status in status_options %}
+                <input type="checkbox" name="status" value="{{ status }}"
+                    {% if status in selected_statuses %}checked{% endif %}> {{ status }}<br>
+            {% endfor %}
+        </div>
+
+        <!-- Category checkboxes -->
+        <div class="col-auto">
+            <label>Category:</label><br>
+            {% for category in category_options %}
+                <input type="checkbox" name="category" value="{{ category }}"
+                    {% if category in selected_categories %}checked{% endif %}> {{ category }}<br>
+            {% endfor %}
+        </div>
+
+        <!-- Brand checkboxes -->
+        <div class="col-auto">
+            <label>Brand:</label><br>
+            {% for brand in brand_options %}
+                <input type="checkbox" name="brand" value="{{ brand }}"
+                    {% if brand in selected_brands %}checked{% endif %}> {{ brand }}<br>
+            {% endfor %}
+        </div>
+
+        <!-- Location checkboxes -->
+        <div class="col-auto">
+            <label>Location:</label><br>
+            {% for location in location_options %}
+                <input type="checkbox" name="location" value="{{ location }}"
+                    {% if location in selected_locations %}checked{% endif %}> {{ location }}<br>
+            {% endfor %}
+        </div>
+
+        <!-- Date filters -->
+        <div class="col-auto">
+            <label>Purchase Date:</label><br>
+            <input type="date" name="start_date" value="{{ start_date }}">
+            to
+            <input type="date" name="end_date" value="{{ end_date }}">
+        </div>
+
+        <!-- Submit button -->
+        <div class="col-auto align-self-end">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+        </div>
+    </form>
+</div>
+
 <div class="table-responsive">
     <table class="table table-bordered table-striped align-middle">
         <thead class="table-header">

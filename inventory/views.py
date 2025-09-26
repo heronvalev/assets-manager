@@ -12,11 +12,66 @@ def asset_list(request):
     """
     Display a list of all assets with basic info.
     """
+    # Prepare options for filter checkboxes
+    status_options = [
+        Asset.STATUS_OPERATIONAL, 
+        Asset.STATUS_MAINTENANCE,
+        Asset.STATUS_DECOMMISSIONED, 
+        Asset.STATUS_LOST,
+        Asset.STATUS_PENDING, 
+        Asset.STATUS_RESERVED
+    ]
+    category_options = Asset.objects.values_list('category', flat=True).distinct()
+    brand_options = Asset.objects.values_list('brand', flat=True).distinct()
+    location_options = Asset.objects.values_list('location', flat=True).distinct()
+
+    # Get filter values from GET parameters (from submitted form)
+    selected_statuses = request.GET.getlist('status')
+    selected_categories = request.GET.getlist('category')
+    selected_brands = request.GET.getlist('brand')
+    selected_locations = request.GET.getlist('location')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    # Construct the query (adding filters (if any selected) consecutively)
     assets = Asset.objects.all().order_by('name')
+
+    # Apply status filter
+    if selected_statuses:
+        assets = assets.filter(status__in=selected_statuses)
     
+    # Apply category filter
+    if selected_categories:
+        assets = assets.filter(category__in=selected_categories)
+
+    # Apply brand filter
+    if selected_brands:
+        assets = assets.filter(brand__in=selected_brands)
+
+    # Apply location filter
+    if selected_locations:
+        assets = assets.filter(location__in=selected_locations)
+
+    # Filter by purchase date range if provided
+    if start_date:
+        assets = assets.filter(purchase_date__gte=start_date)
+    if end_date:
+        assets = assets.filter(purchase_date__lte=end_date)
+
     context = {
-        'assets': assets
+        'assets': assets,
+        'status_options': status_options,
+        'category_options': category_options,
+        'brand_options': brand_options,
+        'location_options': location_options,
+        'selected_statuses': selected_statuses,
+        'selected_categories': selected_categories,
+        'selected_brands': selected_brands,
+        'selected_locations': selected_locations,
+        'start_date': start_date,
+        'end_date': end_date,
     }
+
     return render(request, 'inventory/asset_list.html', context)
 
 # All assignments page
@@ -24,11 +79,51 @@ def assignment_list(request):
     """
     Display a list of all assignments, active and historical.
     """
+    # Prepare options for assignment filters
+    locations = Assignment.objects.values_list("location", flat=True).distinct()
+
+    # Get filter values from GET parameters (from submitted form)
+    status_filter = request.GET.get("status")
+    location_filter = request.GET.getlist("location")
+    assigned_start = request.GET.get("assigned_start")
+    assigned_end = request.GET.get("assigned_end")
+    returned_start = request.GET.get("returned_start")
+    returned_end = request.GET.get("returned_end")
+
+    # Construct the query (adding filters (if any selected) consecutively)
     assignments = Assignment.objects.select_related('asset', 'entra_user').order_by('-assigned_date')
+
+    # Apply filters if provided
+    if status_filter:
+        if status_filter == "active":
+            assignments = assignments.filter(returned_date__isnull=True)
+        elif status_filter == "returned":
+            assignments = assignments.filter(returned_date__isnull=False)
+
+    if location_filter:
+        assignments = assignments.filter(location__in=location_filter)
+
+    if assigned_start:
+        assignments = assignments.filter(assigned_date__gte=assigned_start)
+    if assigned_end:
+        assignments = assignments.filter(assigned_date__lte=assigned_end)
+
+    if returned_start:
+        assignments = assignments.filter(returned_date__gte=returned_start)
+    if returned_end:
+        assignments = assignments.filter(returned_date__lte=returned_end)
     
     context = {
-        'assignments': assignments
+    'assignments': assignments,
+    'locations': locations,
+    'status_filter': status_filter,
+    'location_filter': location_filter,
+    'assigned_start': assigned_start,
+    'assigned_end': assigned_end,
+    'returned_start': returned_start,
+    'returned_end': returned_end,
     }
+
     return render(request, 'inventory/assignment_list.html', context)
 
 # Single asset detail page
@@ -240,5 +335,5 @@ def home(request):
         'unassigned_operational': unassigned_operational,
         'need_work': need_work
     }
-    
+
     return render(request, 'inventory/home.html', context)

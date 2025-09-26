@@ -9,6 +9,46 @@
     <a href="{% url 'create_assignment' %}" class="btn btn-primary">Add Assignment</a>
 </div>
 
+<div class="mb-3">
+    <form method="get" class="row g-3">
+        <!-- Status radio buttons -->
+        <div class="col-auto">
+            <label>Status:</label><br>
+            <input type="radio" name="status" value="" {% if not status_filter %}checked{% endif %}> All<br>
+            <input type="radio" name="status" value="active" {% if status_filter == "active" %}checked{% endif %}> Active<br>
+            <input type="radio" name="status" value="returned" {% if status_filter == "returned" %}checked{% endif %}> Returned<br>
+        </div>
+
+        <!-- Location checkboxes -->
+        <div class="col-auto">
+            <label>Location:</label><br>
+            {% for location in locations %}
+                <input type="checkbox" name="location" value="{{ location }}"
+                    {% if location in location_filter %}checked{% endif %}> {{ location }}<br>
+            {% endfor %}
+        </div>
+
+        <!-- Assigned date range -->
+        <div class="col-auto">
+            <label>Assigned Date:</label><br>
+            <input type="date" name="assigned_start" value="{{ assigned_start }}"> to
+            <input type="date" name="assigned_end" value="{{ assigned_end }}">
+        </div>
+
+        <!-- Returned date range -->
+        <div class="col-auto">
+            <label>Returned Date:</label><br>
+            <input type="date" name="returned_start" value="{{ returned_start }}"> to
+            <input type="date" name="returned_end" value="{{ returned_end }}">
+        </div>
+
+        <!-- Submit button -->
+        <div class="col-auto align-self-end">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+        </div>
+    </form>
+</div>
+
 <div class="table-responsive">
     <table class="table table-bordered table-striped align-middle">
         <thead class="table-header">
@@ -20,6 +60,7 @@
                 <th>Location</th>
                 <th>Reason</th>
                 <th>Notes</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
