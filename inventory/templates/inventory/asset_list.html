@@ -65,17 +65,127 @@
     <table class="table table-bordered table-striped align-middle">
         <thead class="table-header">
             <tr>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Brand</th>
-                <th>Model</th>
-                <th>Serial Number</th>
-                <th>Purchase Date</th>
-                <th>Status</th>
+                
+                <th>
+                    <a 
+                        style="color:inherit; text-decoration:none;"
+                        onmouseover="this.style.textDecoration='underline'"
+                        onmouseout="this.style.textDecoration='none'"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if sort_field == 'name' %}-name{% else %}name{% endif %}"
+                    >
+                        Name
+                        {% if sort_field == 'name' %}
+                        ▲
+                        {% elif sort_field == '-name' %}
+                        ▼
+                        {% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a 
+                        href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if sort_field == 'category' %}-category{% else %}category{% endif %}"
+                        style="color: inherit; text-decoration: none;"
+                        onmouseover="this.style.textDecoration='underline'"
+                        onmouseout="this.style.textDecoration='none'"
+                    >
+                        Category
+                        {% if sort_field == 'category' %}
+                        ▲
+                        {% elif sort_field == '-category' %}
+                        ▼
+                        {% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a 
+                        href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if sort_field == 'brand' %}-brand{% else %}brand{% endif %}"
+                        style="color: inherit; text-decoration: none;"
+                        onmouseover="this.style.textDecoration='underline'"
+                        onmouseout="this.style.textDecoration='none'"
+                    >
+                        Brand
+                        {% if sort_field == 'brand' %}
+                        ▲
+                        {% elif sort_field == '-brand' %}
+                        ▼
+                        {% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a 
+                        href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if sort_field == 'model' %}-model{% else %}model{% endif %}"
+                        style="color: inherit; text-decoration: none;"
+                        onmouseover="this.style.textDecoration='underline'"
+                        onmouseout="this.style.textDecoration='none'"
+                    >
+                        Model
+                        {% if sort_field == 'model' %}
+                        ▲
+                        {% elif sort_field == '-model' %}
+                        ▼
+                        {% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a 
+                        href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if sort_field == 'serial_number' %}-serial_number{% else %}serial_number{% endif %}"
+                        style="color: inherit; text-decoration: none;"
+                        onmouseover="this.style.textDecoration='underline'"
+                        onmouseout="this.style.textDecoration='none'"
+                    >
+                        Serial Number
+                        {% if sort_field == 'serial_number' %}
+                        ▲
+                        {% elif sort_field == '-serial_number' %}
+                        ▼
+                        {% endif %}
+                    </a>              
+                </th>
+                    
+                <th>
+                    <a 
+                        href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if sort_field == 'purchase_date' %}-purchase_date{% else %}purchase_date{% endif %}"
+                        style="color: inherit; text-decoration: none;"
+                        onmouseover="this.style.textDecoration='underline'"
+                        onmouseout="this.style.textDecoration='none'"
+                    >
+                        Purchase Date
+                        {% if sort_field == 'purchase_date' %}
+                        ▲
+                        {% elif sort_field == '-purchase_date' %}
+                        ▼
+                        {% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a 
+                        href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if sort_field == 'status' %}-status{% else %}status{% endif %}"
+                        style="color: inherit; text-decoration: none;"
+                        onmouseover="this.style.textDecoration='underline'"
+                        onmouseout="this.style.textDecoration='none'"
+                    >
+                        Status
+                        {% if sort_field == 'status' %}
+                        ▲
+                        {% elif sort_field == '-status' %}
+                        ▼
+                        {% endif %}
+                    </a>
+                </th>
+
                 <th>Notes</th>
+
                 <th>Currently Assigned?</th>
+
                 <th>Current Location</th>
+                
             </tr>
+
         </thead>
         <tbody>
             {% for asset in assets %}

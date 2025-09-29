@@ -58,6 +58,12 @@ def asset_list(request):
     if end_date:
         assets = assets.filter(purchase_date__lte=end_date)
 
+    # Get sort field from GET parameters, default to 'name'
+    sort_field = request.GET.get('sort', 'name')
+
+    # Apply sorting to the assets queryset
+    assets = assets.order_by(sort_field)
+
     context = {
         'assets': assets,
         'status_options': status_options,
@@ -70,6 +76,7 @@ def asset_list(request):
         'selected_locations': selected_locations,
         'start_date': start_date,
         'end_date': end_date,
+        'sort_field': sort_field,
     }
 
     return render(request, 'inventory/asset_list.html', context)
@@ -113,6 +120,12 @@ def assignment_list(request):
     if returned_end:
         assignments = assignments.filter(returned_date__lte=returned_end)
     
+    # Get sort field from GET parameters, default to '-assigned_date' (newest first)
+    sort_field = request.GET.get('sort', '-assigned_date')
+
+    # Apply sorting
+    assignments = assignments.order_by(sort_field)
+    
     context = {
     'assignments': assignments,
     'locations': locations,
@@ -122,11 +135,12 @@ def assignment_list(request):
     'assigned_end': assigned_end,
     'returned_start': returned_start,
     'returned_end': returned_end,
+    'sort_field': sort_field,
     }
 
     return render(request, 'inventory/assignment_list.html', context)
 
-# Single asset detail page
+# Single asset details & assignments page
 def asset_details(request, asset_id):
     """
     Display details for a single asset, including current and past assignments.
@@ -135,15 +149,22 @@ def asset_details(request, asset_id):
     active_assignment = asset.assignments.filter(returned_date__isnull=True).first()
     assignments = asset.assignments.select_related('entra_user').order_by('-assigned_date')
 
+    # Get sort field from GET parameters, default to '-assigned_date' (newest first)
+    sort_field = request.GET.get('sort', '-assigned_date')
+
+    # Apply sorting
+    assignments = assignments.order_by(sort_field)
+
     context = {
         'asset': asset,
         'assignments': assignments,
-        'active_assignment': active_assignment
+        'active_assignment': active_assignment,
+        'sort_field': sort_field,
     }
     
     return render(request, 'inventory/asset_details.html', context)
 
-# Single user details & assignments
+# Single user details & assignments page
 def user_assignments(request, user_id):
     """
     Display all assignments for a single user.
@@ -151,10 +172,18 @@ def user_assignments(request, user_id):
     user = get_object_or_404(EntraUser, id=user_id)
     assignments = user.user_assignments.select_related('asset').order_by('-assigned_date')
 
+    # Get sort field from GET parameters, default to '-assigned_date' (newest first)
+    sort_field = request.GET.get('sort', '-assigned_date')
+
+    # Apply sorting
+    assignments = assignments.order_by(sort_field)
+
     context = {
         'user': user,
-        'assignments': assignments
+        'assignments': assignments,
+        'sort_field': sort_field,
     }
+
     return render(request, 'inventory/user_assignments.html', context)
 
 # All Entra ID users page
@@ -162,11 +191,40 @@ def user_list(request):
     """
     Display a read-only list of all Entra users.
     """
-    users = EntraUser.objects.all().order_by('display_name')
+    # Prepare options for filters
+    departments = EntraUser.objects.values_list('department', flat=True).distinct()
+
+    # Get filter values from GET parameters
+    department_filter = request.GET.getlist('department')
+    is_active_filter = request.GET.get('is_active', 'all')
+
+    # Construct the query (adding filters (if any selected) consecutively)
+    users = EntraUser.objects.all()
+
+    # Apply department filter
+    if department_filter:
+        users = users.filter(department__in=department_filter)
+
+    # Apply is_active filter
+    if is_active_filter == 'true':
+        users = users.filter(is_active=True)
+    elif is_active_filter == 'false':
+        users = users.filter(is_active=False)
     
+    # Get sort field from GET parameters, default to 'display_name'
+    sort_field = request.GET.get('sort', 'display_name')
+
+    # Apply sorting
+    users = users.order_by(sort_field)
+
     context = {
-        'users': users
+        'users': users,
+        'departments': departments,
+        'department_filter': department_filter,
+        'is_active_filter': is_active_filter,
+        'sort_field': sort_field,
     }
+
     return render(request, 'inventory/user_list.html', context)
 
 # Add an asset form page

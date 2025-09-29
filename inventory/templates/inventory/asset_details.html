@@ -31,11 +31,72 @@
 <table class="table table-bordered table-striped align-middle">
     <thead class="table-header">
         <tr>
-            <th>User / Team</th>
-            <th>Assigned Date</th>
-            <th>Returned Date</th>
-            <th>Location</th>
+            <th>
+                <a 
+                    style="color:inherit; text-decoration:none;"
+                    onmouseover="this.style.textDecoration='underline'"
+                    onmouseout="this.style.textDecoration='none'"
+                    href="?sort={% if sort_field == 'entra_user__upn' %}-entra_user__upn{% else %}entra_user__upn{% endif %}"
+                >
+                    User / Team
+                    {% if sort_field == 'entra_user__upn' %}
+                    ▲
+                    {% elif sort_field == '-entra_user__upn' %}
+                    ▼
+                    {% endif %}
+                </a>
+            </th>
+
+            <th>
+                <a 
+                    style="color:inherit; text-decoration:none;"
+                    onmouseover="this.style.textDecoration='underline'"
+                    onmouseout="this.style.textDecoration='none'"
+                    href="?sort={% if sort_field == 'assigned_date' %}-assigned_date{% else %}assigned_date{% endif %}"
+                >
+                    Assigned Date
+                    {% if sort_field == 'assigned_date' %}
+                    ▲
+                    {% elif sort_field == '-assigned_date' %}
+                    ▼
+                    {% endif %}
+                </a>
+            </th>
+
+            <th>
+                <a 
+                    style="color:inherit; text-decoration:none;"
+                    onmouseover="this.style.textDecoration='underline'"
+                    onmouseout="this.style.textDecoration='none'"
+                    href="?sort={% if sort_field == 'returned_date' %}-returned_date{% else %}returned_date{% endif %}"
+                >
+                    Returned Date
+                    {% if sort_field == 'returned_date' %}
+                    ▲
+                    {% elif sort_field == '-returned_date' %}
+                    ▼
+                    {% endif %}
+                </a>
+            </th>
+
+            <th>
+                <a 
+                    style="color:inherit; text-decoration:none;"
+                    onmouseover="this.style.textDecoration='underline'"
+                    onmouseout="this.style.textDecoration='none'"
+                    href="?sort={% if sort_field == 'location' %}-location{% else %}location{% endif %}"
+                >
+                    Location
+                    {% if sort_field == 'location' %}
+                    ▲
+                    {% elif sort_field == '-location' %}
+                    ▼
+                    {% endif %}
+                </a>
+            </th>
+
             <th>Reason</th>
+
             <th>Notes</th>
         </tr>
     </thead>
@@ -44,8 +105,10 @@
         <tr>
             
             <td>
-                {% if assignment.entra_user %}
-                    {{ assignment.entra_user.upn }}
+                {% if asset.get_current_user %}
+                    <a href="{% url 'user_assignments' asset.get_current_user.id %}">
+                        {{ asset.get_current_user.upn }}
+                    </a>
                 {% else %}
                     Team/Room
                 {% endif %}

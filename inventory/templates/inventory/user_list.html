@@ -3,16 +3,105 @@
 {% block title %}All Users{% endblock %}
 
 {% block content %}
-<h2>All Users</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>All Users</h2>
+</div>
+
+<div class="mb-3">
+    <form method="get" class="row g-3">
+        <!-- Department checkboxes -->
+        <div class="col-auto">
+            <label>Department:</label><br>
+            {% for dept in departments %}
+                <input type="checkbox" name="department" value="{{ dept }}"
+                    {% if dept in department_filter %}checked{% endif %}>
+                {{ dept }}<br>
+            {% endfor %}
+        </div>
+
+        <!-- Active status radio buttons -->
+        <div class="col-auto">
+            <label>Active:</label><br>
+            <input type="radio" name="is_active" value="all" {% if is_active_filter == 'all' %}checked{% endif %}> All<br>
+            <input type="radio" name="is_active" value="true" {% if is_active_filter == 'true' %}checked{% endif %}> Yes<br>
+            <input type="radio" name="is_active" value="false" {% if is_active_filter == 'false' %}checked{% endif %}> No<br>
+        </div>
+
+        <!-- Submit button -->
+        <div class="col-auto align-self-end">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+        </div>
+    </form>
+</div>
 
 <div class="table-responsive">
     <table class="table table-bordered table-striped align-middle">
         <thead class="table-header">
             <tr>
-                <th>Display Name</th>
-                <th>UPN</th>
-                <th>Department</th>
-                <th>Active</th>
+                <th>
+                    <a 
+                        style="color:inherit; text-decoration:none;"
+                        onmouseover="this.style.textDecoration='underline'"
+                        onmouseout="this.style.textDecoration='none'"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if sort_field == 'display_name' %}-display_name{% else %}display_name{% endif %}"
+                    >
+                        Display Name
+                        {% if sort_field == 'display_name' %}
+                        ▲
+                        {% elif sort_field == '-display_name' %}
+                        ▼
+                        {% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a 
+                        style="color:inherit; text-decoration:none;"
+                        onmouseover="this.style.textDecoration='underline'"
+                        onmouseout="this.style.textDecoration='none'"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if sort_field == 'upn' %}-upn{% else %}upn{% endif %}"
+                    >
+                        UPN
+                        {% if sort_field == 'upn' %}
+                        ▲
+                        {% elif sort_field == '-upn' %}
+                        ▼
+                        {% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a 
+                        style="color:inherit; text-decoration:none;"
+                        onmouseover="this.style.textDecoration='underline'"
+                        onmouseout="this.style.textDecoration='none'"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if sort_field == 'department' %}-department{% else %}department{% endif %}"
+                    >
+                        Department
+                        {% if sort_field == 'department' %}
+                        ▲
+                        {% elif sort_field == '-department' %}
+                        ▼
+                        {% endif %}
+                    </a>
+                </th>
+
+                <th>
+                    <a 
+                        style="color:inherit; text-decoration:none;"
+                        onmouseover="this.style.textDecoration='underline'"
+                        onmouseout="this.style.textDecoration='none'"
+                        href="?{% for key, value in request.GET.items %}{% if key != 'sort' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort={% if sort_field == 'is_active' %}-is_active{% else %}is_active{% endif %}"
+                    >
+                        Active
+                        {% if sort_field == 'is_active' %}
+                        ▲
+                        {% elif sort_field == '-is_active' %}
+                        ▼
+                        {% endif %}
+                    </a>
+                </th>
+
             </tr>
         </thead>
         <tbody>
