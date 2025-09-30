@@ -4,8 +4,11 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ asset.name }} ({{ asset.serial_number }})</h2>
-    <a href="{% url 'edit_asset' asset.id %}" class="btn btn-primary">Edit</a>
+    <h2 class="mb-0">{{ asset.name }} ({{ asset.serial_number }})</h2>
+    <div class="d-flex flex-column gap-2">
+        <a href="{% url 'edit_asset' asset.id %}" class="btn btn-primary">Edit</a>
+        <a href="{% url 'asset_confirm_delete' asset.id %}" class="btn btn-danger">Delete</a>
+    </div>
 </div>
 
 {% if not asset.is_assigned %}

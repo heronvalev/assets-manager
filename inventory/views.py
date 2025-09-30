@@ -395,3 +395,13 @@ def home(request):
     }
 
     return render(request, 'inventory/home.html', context)
+
+# Delete asset confirmation page
+def asset_delete(request, asset_id):
+    asset = get_object_or_404(Asset, id=asset_id)
+
+    if request.method == "POST":
+        asset.delete()
+        return redirect('asset_list')
+
+    return render(request, 'inventory/asset_confirm_delete.html', {'asset': asset})

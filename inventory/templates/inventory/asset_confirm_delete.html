@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Asset{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Delete Asset</h2>
+    <p>
+        Are you sure you want to permanently delete the asset 
+        <strong>{{ asset.name }}</strong> (Serial: {{ asset.serial_number }})?
+    </p>
+    <p class="text-danger">
+        This will also delete all related assignments.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <a href="{% url 'asset_details' asset.id %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+</div>
+{% endblock %}
