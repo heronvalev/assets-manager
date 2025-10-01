@@ -4,8 +4,13 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
+    
     <h2>Assets</h2>
-    <a href="{% url 'create_asset' %}" class="btn btn-primary">Add Asset</a>
+
+    {% if perms.inventory.add_asset %}
+        <a href="{% url 'create_asset' %}" class="btn btn-primary">Add Asset</a>
+    {% endif %}
+
 </div>
 
 <div class="mb-3">

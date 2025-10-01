@@ -7,7 +7,7 @@
         <p class="lead mb-4">Manage your company devices</p>
         <a href="{% url 'ms_login' %}" class="btn btn-primary btn-lg">Log in to explore</a>
     {% else %}
-        <h1 class="display-5 mb-4">Welcome back, {{ request.user.first_name|default:request.user.username }}!</h1>
+        <h1 class="display-5 mb-4">Welcome, {{ request.user.first_name|default:request.user.username }}!</h1>
         <p class="lead">Use the navigation bar to manage assets, assignments, and users.</p>
 
         <div class="row text-center my-4">

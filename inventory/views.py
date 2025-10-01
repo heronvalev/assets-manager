@@ -4,8 +4,10 @@ from .forms import AssetForm, AssignmentForm, AssignmentEditForm
 import msal
 from django.conf import settings
 from django.contrib.auth import login, logout as django_logout
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
 import requests
+from django.contrib.auth.decorators import permission_required, user_passes_test
+from django.contrib import messages
 
 # All assets page
 def asset_list(request):
@@ -228,6 +230,7 @@ def user_list(request):
     return render(request, 'inventory/user_list.html', context)
 
 # Add an asset form page
+@permission_required('inventory.add_asset', raise_exception=True)
 def create_asset(request):
     """
     Handles the creation of a new Asset.
@@ -248,6 +251,7 @@ def create_asset(request):
     return render(request, 'inventory/asset_form.html', {'form': form})
 
 # Edit an asset form page
+@permission_required('inventory.change_asset', raise_exception=True)
 def edit_asset(request, asset_id):
     """
     Edit an existing asset.
@@ -267,6 +271,7 @@ def edit_asset(request, asset_id):
     return render(request, 'inventory/asset_form.html', {'form': form, 'edit': True})
 
 # Create assignment form page
+@permission_required('inventory.add_assignment', raise_exception=True)
 def create_assignment(request):
     asset_id = request.GET.get('asset_id')
     
@@ -284,6 +289,7 @@ def create_assignment(request):
     return render(request, 'inventory/create_assignment.html', {'form': form})
 
 # Edit an assignment
+@permission_required('inventory.change_assignment', raise_exception=True)
 def edit_assignment(request, assignment_id):
     """
     Edit an existing assignment (limited fields for historical integrity).
@@ -397,6 +403,7 @@ def home(request):
     return render(request, 'inventory/home.html', context)
 
 # Delete asset confirmation page
+@permission_required('inventory.delete_asset', raise_exception=True)
 def asset_delete(request, asset_id):
     asset = get_object_or_404(Asset, id=asset_id)
 
