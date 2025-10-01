@@ -19,6 +19,9 @@
                     <li><a href="{% url 'asset_list' %}" class="nav-link px-2">Assets</a></li>
                     <li><a href="{% url 'assignment_list' %}" class="nav-link px-2">Assignments</a></li>
                     <li><a href="{% url 'user_list' %}" class="nav-link px-2">Users</a></li>
+                        {% if perms.auth.change_user %}
+                            <li><a href="{% url 'management' %}" class="nav-link px-2">Management</a></li>
+                        {% endif%}
                     {% endif %}
                 </ul>
 

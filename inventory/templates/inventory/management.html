@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Management{% endblock %}
+
+{% block content %}
+<h2>User Groups</h2>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>User</th>
+                {% for group in groups %}
+                    <th>{{ group.name }}</th>
+                {% endfor %}
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                {% for group in groups %}
+                    <td>
+                        <input type="checkbox" name="groups" value="{{ group.name }}"
+                            {% if group in user.groups.all %}checked{% endif %}>
+                    </td>
+                {% endfor %}
+                <td>
+                    <button type="submit" name="user_id" value="{{ user.id }}" class="btn btn-primary btn-sm">
+                        Update
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+{% endblock %}

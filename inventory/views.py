@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth import login, logout as django_logout
 from django.contrib.auth.models import User, Group, Permission
 import requests
-from django.contrib.auth.decorators import permission_required, user_passes_test
+from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib import messages
 
 # All assets page
@@ -412,3 +412,29 @@ def asset_delete(request, asset_id):
         return redirect('asset_list')
 
     return render(request, 'inventory/asset_confirm_delete.html', {'asset': asset})
+
+# Management page
+@login_required
+@permission_required('auth.change_user', raise_exception=True)
+def management(request):
+    users = User.objects.all().order_by('username')
+    groups = Group.objects.all()
+
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        selected_groups = request.POST.getlist('groups')
+
+        try:
+            user = User.objects.get(id=user_id)
+            user.groups.set(Group.objects.filter(name__in=selected_groups))
+            messages.success(request, f"Updated groups for {user.username}.")
+
+        except User.DoesNotExist:
+            messages.error(request, "User not found.")
+
+    context = {
+        'users': users,
+        'groups': groups
+    }
+    
+    return render(request, 'inventory/management.html', context)

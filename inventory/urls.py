@@ -16,4 +16,5 @@ urlpatterns = [
     path('logout/', views.ms_logout, name='ms_logout'),
     path('', views.home, name='home'),
     path('assets/<int:asset_id>/delete/', views.asset_delete, name='asset_confirm_delete'),
+    path('management/', views.management, name='management'),
 ]
