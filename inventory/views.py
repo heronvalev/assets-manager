@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
-from .models import Asset, Assignment, EntraUser
+from .models import Asset, Assignment, EntraUser, OSOption
 from .forms import AssetForm, AssignmentForm, AssignmentEditForm
 import msal
 from django.conf import settings
@@ -34,9 +34,14 @@ def asset_list(request):
     selected_locations = request.GET.getlist('location')
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
+    unassigned_only = request.GET.get('unassigned')
 
     # Construct the query (adding filters (if any selected) consecutively)
     assets = Asset.objects.all().order_by('name')
+
+    # Apply "available" filter (status=Operational and unassigned)
+    if unassigned_only == "true":
+        assets = assets.exclude(assignments__returned_date__isnull=True)
 
     # Apply status filter
     if selected_statuses:
@@ -419,22 +424,51 @@ def asset_delete(request, asset_id):
 def management(request):
     users = User.objects.all().order_by('username')
     groups = Group.objects.all()
+    os_options = OSOption.objects.all().order_by('name')
 
     if request.method == 'POST':
-        user_id = request.POST.get('user_id')
-        selected_groups = request.POST.getlist('groups')
+        form_type = request.POST.get('form_type')
 
-        try:
-            user = User.objects.get(id=user_id)
-            user.groups.set(Group.objects.filter(name__in=selected_groups))
-            messages.success(request, f"Updated groups for {user.username}.")
+        # If user groups edit is submitted
+        if form_type == 'user_groups':
+            
+            user_id = request.POST.get('user_id')
+            selected_groups = request.POST.getlist('groups')
+            try:
+                user = User.objects.get(id=user_id)
+                user.groups.set(Group.objects.filter(name__in=selected_groups))
+                messages.success(request, f"Updated groups for {user.username}.")
 
-        except User.DoesNotExist:
-            messages.error(request, "User not found.")
+            except User.DoesNotExist:
+                messages.error(request, "User not found.")
+
+        # if OS options edit is submitted
+        elif form_type == 'os_options':
+
+            new_os = request.POST.get('new_os')
+            delete_os_id = request.POST.get('delete_os_id')
+
+            if new_os:
+                os_option, created = OSOption.objects.get_or_create(name=new_os)
+                if created:
+                    messages.success(request, f"Added OS option: {new_os}.")
+                else:
+                    messages.warning(request, f"OS option '{new_os}' already exists.")
+
+            elif delete_os_id:
+                try:
+                    os_to_delete = OSOption.objects.get(id=delete_os_id)
+                    os_to_delete.delete()
+                    messages.success(request, f"Deleted OS option: {os_to_delete.name}.")
+                except OSOption.DoesNotExist:
+                    messages.error(request, "OS option not found.")
+
+        return redirect('management')
 
     context = {
         'users': users,
-        'groups': groups
+        'groups': groups,
+        'os_options': os_options
     }
     
     return render(request, 'inventory/management.html', context)

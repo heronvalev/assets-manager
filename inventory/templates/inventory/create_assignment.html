@@ -31,17 +31,22 @@
             </div>
         {% endfor %}
 
-        <div class="col-12">
+        <div class="col-12 d-flex gap-2">
             <button type="submit" class="btn btn-primary">
-
                 {% if edit %}
                     Update Assignment
                 {% else %}
                     Save Assignment
                 {% endif %}
-
             </button>
+
+            {% if request.META.HTTP_REFERER %}
+                <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-secondary">Cancel</a>
+            {% else %}
+                <a href="{% url 'assignment_list' %}" class="btn btn-secondary">Cancel</a>
+            {% endif %}
         </div>
+
     </form>
 </div>
 {% endblock %}

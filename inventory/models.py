@@ -1,6 +1,13 @@
 from django.db import models
 from django.utils import timezone
 
+# Operating System (OS) options 
+class OSOption(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+    
 # Entra Users table to sync with Microsoft Graph API
 class EntraUser(models.Model):
     entra_user_id = models.CharField(max_length=36, unique=True)
@@ -36,6 +43,7 @@ class Asset(models.Model):
     category = models.CharField(max_length=50, blank=True)
     brand = models.CharField(max_length=50, blank=True)
     model = models.CharField(max_length=50, blank=True)
+    os = models.ForeignKey(OSOption, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="OS")
     serial_number = models.CharField(max_length=100, unique=True)
     purchase_date = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_OPERATIONAL)

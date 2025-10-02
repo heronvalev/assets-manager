@@ -3,7 +3,15 @@
 {% block title %}Management{% endblock %}
 
 {% block content %}
+
 <h2>User Groups</h2>
+
+<p style="color:#996633;">
+    Each group grants specific permissions:<br>
+    <strong>Admin:</strong> Can manage users (add/remove from groups), add/delete OS options, and also has full add/edit/delete permissions for assets and assignments.<br>
+    <strong>Editor:</strong> Can add and edit assets and assignments, but cannot delete assets, manage user groups or OS options.<br>
+    <strong>Viewer:</strong> Can view assets and assignments only; cannot add, edit, or delete.
+</p>
 
 {% if messages %}
     {% for message in messages %}
@@ -13,6 +21,7 @@
 
 <form method="post">
     {% csrf_token %}
+    <input type="hidden" name="form_type" value="user_groups">
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -39,6 +48,53 @@
                     </button>
                 </td>
             </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+
+<hr style="border-top: 1px solid #A0522D; margin: 2rem 0;">
+
+<h2>OS Options</h2>
+
+<p style="color:#996633;">
+    OS options added here will appear as selectable choices when creating or editing an asset. 
+</p>
+
+<form method="post" class="mb-3">
+    {% csrf_token %}
+    <input type="hidden" name="form_type" value="os_options">
+
+    <!-- Add new OS -->
+    <div class="mb-3 row g-2 align-items-center">
+        <div class="col-auto">
+            <input type="text" name="new_os" class="form-control" placeholder="New OS name">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-success btn-sm">Add OS</button>
+        </div>
+    </div>
+
+    <!-- List existing OS options with delete button -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>OS Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for os in os_options %}
+            <tr>
+                <td>{{ os.name }}</td>
+                <td>
+                    <button type="submit" name="delete_os_id" value="{{ os.id }}" class="btn btn-danger btn-sm">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2">No OS options found.</td></tr>
             {% endfor %}
         </tbody>
     </table>

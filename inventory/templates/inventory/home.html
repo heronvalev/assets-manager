@@ -13,24 +13,64 @@
         <div class="row text-center my-4">
 
             <div class="col-md-4">
+
                 <div class="p-4 bg-light rounded shadow">
                     <h5>Total Assets</h5>
-                    <p class="fs-2 fw-bold">{{ total_assets }}</p>
+                    <p>
+                        <a href="{% url 'asset_list' %}"
+                            class="fs-2 fw-bold text-decoration-none d-inline-block"
+                            style="color: #5C3A21;">
+                            {{ total_assets }}
+                        </a>
+                    </p>
                 </div>
+
+                <p class="mt-3" style="color:#996633;">
+                    Total number of assets.
+                </p>
+
             </div>
 
             <div class="col-md-4">
+
                 <div class="p-4 bg-light rounded shadow">
+
                     <h5>Available Assets</h5>
-                    <p class="fs-2 fw-bold">{{ unassigned_operational }}</p>
+                    <p>
+                        <a href="{% url 'asset_list' %}?unassigned=true&status=Operational"
+                            class="fs-2 fw-bold text-decoration-none d-inline-block"
+                            style="color: #5C3A21;">
+                            {{ unassigned_operational}}
+                        </a>
+                    </p>
+
                 </div>
+
+                <p class="mt-3" style="color:#996633;">
+                    Total unassigned assets with status "Operational".
+                </p>
+
             </div>
 
             <div class="col-md-4">
+
                 <div class="p-4 bg-light rounded shadow">
+
                     <h5>Requires Attention</h5>
-                    <p class="fs-2 fw-bold">{{ need_work }}</p>
+                    <p>
+                        <a href="{% url 'asset_list' %}?status=Pending+Setup&status=Maintenance"
+                            class="fs-2 fw-bold text-decoration-none d-inline-block"
+                            style="color: #5C3A21;">
+                            {{ need_work }}
+                        </a>
+                    </p>
+
                 </div>
+
+                <p class="mt-3" style="color:#996633;">
+                    Total assets with status "Maintenance" or status "Pending Setup".
+                </p>
+
             </div>
 
         </div>
