@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Login Error{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-3">Login Error</h2>
+
+  <div class="alert alert-danger" role="alert">
+    {{ message }}
+  </div>
+
+  <a href="{% url 'ms_login' %}" class="btn btn-primary">Try again</a>
+  <a href="{% url 'home' %}" class="btn btn-secondary ms-2">Back to Home</a>
+</div>
+{% endblock %}
