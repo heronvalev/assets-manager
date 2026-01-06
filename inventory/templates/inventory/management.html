@@ -38,7 +38,7 @@
                 <td>{{ user.username }}</td>
                 {% for group in groups %}
                     <td>
-                        <input type="checkbox" name="groups" value="{{ group.name }}"
+                        <input type="checkbox" name="groups_{{ user.id }}" value="{{ group.id }}"
                             {% if group in user.groups.all %}checked{% endif %}>
                     </td>
                 {% endfor %}

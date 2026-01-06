@@ -433,10 +433,10 @@ def management(request):
         if form_type == 'user_groups':
             
             user_id = request.POST.get('user_id')
-            selected_groups = request.POST.getlist('groups')
+            selected_groups = request.POST.getlist(f'groups_{user_id}')
             try:
                 user = User.objects.get(id=user_id)
-                user.groups.set(Group.objects.filter(name__in=selected_groups))
+                user.groups.set(Group.objects.filter(id__in=selected_groups))
                 messages.success(request, f"Updated groups for {user.username}.")
 
             except User.DoesNotExist:
