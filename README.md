@@ -229,7 +229,7 @@ If you deploy this project to Azure App Service (or similar):
 ![Home dashboard](screenshots/home.png)
 
 ### Assets
-![Assets list](screenshots/assets-list.png)
+![Assets list](screenshots/asset-list.png)
 
 ### Asset details
 ![Asset details](screenshots/asset-detail.png)
