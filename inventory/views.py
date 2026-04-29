@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib import messages
 
 # All assets page
+@permission_required('inventory.view_asset', raise_exception=True)
 def asset_list(request):
     """
     Display a list of all assets with basic info.
@@ -89,6 +90,7 @@ def asset_list(request):
     return render(request, 'inventory/asset_list.html', context)
 
 # All assignments page
+@permission_required('inventory.view_assignment', raise_exception=True)
 def assignment_list(request):
     """
     Display a list of all assignments, active and historical.
@@ -148,6 +150,7 @@ def assignment_list(request):
     return render(request, 'inventory/assignment_list.html', context)
 
 # Single asset details & assignments page
+@permission_required('inventory.view_asset', raise_exception=True)
 def asset_details(request, asset_id):
     """
     Display details for a single asset, including current and past assignments.
@@ -172,6 +175,7 @@ def asset_details(request, asset_id):
     return render(request, 'inventory/asset_details.html', context)
 
 # Single user details & assignments page
+@permission_required('inventory.view_entrauser', raise_exception=True)
 def user_assignments(request, user_id):
     """
     Display all assignments for a single user.
@@ -194,6 +198,7 @@ def user_assignments(request, user_id):
     return render(request, 'inventory/user_assignments.html', context)
 
 # All Entra ID users page
+@permission_required('inventory.view_entrauser', raise_exception=True)
 def user_list(request):
     """
     Display a read-only list of all Entra users.
@@ -388,22 +393,25 @@ def ms_logout(request):
 
 # Home/Dashboard page
 def home(request):
+    context = {}
 
-    total_assets = Asset.objects.count()
-    unassigned_operational = Asset.objects.filter(
-        status='Operational'
-    ).exclude(
-        assignments__returned_date__isnull=True
-    ).count()
-    need_work = Asset.objects.filter(
-        status__in=[Asset.STATUS_MAINTENANCE, Asset.STATUS_PENDING]
-    ).count()
-    
-    context = {
-        'total_assets': total_assets,
-        'unassigned_operational': unassigned_operational,
-        'need_work': need_work
-    }
+    # Only calculate and pass internal dashboard stats for logged-in users
+    if request.user.is_authenticated:
+        total_assets = Asset.objects.count()
+        unassigned_operational = Asset.objects.filter(
+            status='Operational'
+        ).exclude(
+            assignments__returned_date__isnull=True
+        ).count()
+        need_work = Asset.objects.filter(
+            status__in=[Asset.STATUS_MAINTENANCE, Asset.STATUS_PENDING]
+        ).count()
+
+        context = {
+            'total_assets': total_assets,
+            'unassigned_operational': unassigned_operational,
+            'need_work': need_work,
+        }
 
     return render(request, 'inventory/home.html', context)
 
