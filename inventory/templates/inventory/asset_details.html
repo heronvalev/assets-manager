@@ -115,9 +115,9 @@
         <tr>
             
             <td>
-                {% if asset.get_current_user %}
-                    <a href="{% url 'user_assignments' asset.get_current_user.id %}">
-                        {{ asset.get_current_user.upn }}
+                {% if assignment.entra_user %}
+                    <a href="{% url 'user_assignments' assignment.entra_user.id %}">
+                        {{ assignment.entra_user.upn }}
                     </a>
                 {% else %}
                     Team/Room
