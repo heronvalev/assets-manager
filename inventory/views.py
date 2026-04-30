@@ -4,10 +4,11 @@ from .forms import AssetForm, AssignmentForm, AssignmentEditForm
 import msal
 from django.conf import settings
 from django.contrib.auth import login, logout as django_logout
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group
 import requests
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib import messages
+
 
 # All assets page
 @permission_required('inventory.view_asset', raise_exception=True)
@@ -38,7 +39,7 @@ def asset_list(request):
     unassigned_only = request.GET.get('unassigned')
 
     # Construct the query (adding filters (if any selected) consecutively)
-    assets = Asset.objects.all().order_by('name')
+    assets = Asset.objects.all()
 
     # Apply "available" filter (status=Operational and unassigned)
     if unassigned_only == "true":
@@ -69,6 +70,27 @@ def asset_list(request):
     # Get sort field from GET parameters, default to 'name'
     sort_field = request.GET.get('sort', 'name')
 
+    # Only allow sorting by known-safe fields
+    allowed_sort_fields = {
+        'name',
+        '-name',
+        'category',
+        '-category',
+        'brand',
+        '-brand',
+        'model',
+        '-model',
+        'serial_number',
+        '-serial_number',
+        'status',
+        '-status',
+        'purchase_date',
+        '-purchase_date',
+    }
+
+    if sort_field not in allowed_sort_fields:
+        sort_field = 'name'
+
     # Apply sorting to the assets queryset
     assets = assets.order_by(sort_field)
 
@@ -89,6 +111,7 @@ def asset_list(request):
 
     return render(request, 'inventory/asset_list.html', context)
 
+
 # All assignments page
 @permission_required('inventory.view_assignment', raise_exception=True)
 def assignment_list(request):
@@ -107,7 +130,7 @@ def assignment_list(request):
     returned_end = request.GET.get("returned_end")
 
     # Construct the query (adding filters (if any selected) consecutively)
-    assignments = Assignment.objects.select_related('asset', 'entra_user').order_by('-assigned_date')
+    assignments = Assignment.objects.select_related('asset', 'entra_user')
 
     # Apply filters if provided
     if status_filter:
@@ -132,6 +155,23 @@ def assignment_list(request):
     # Get sort field from GET parameters, default to '-assigned_date' (newest first)
     sort_field = request.GET.get('sort', '-assigned_date')
 
+    # Only allow sorting by known-safe fields
+    allowed_sort_fields = {
+        'asset__name',
+        '-asset__name',
+        'entra_user__upn',
+        '-entra_user__upn',
+        'assigned_date',
+        '-assigned_date',
+        'returned_date',
+        '-returned_date',
+        'location',
+        '-location',
+    }
+
+    if sort_field not in allowed_sort_fields:
+        sort_field = '-assigned_date'
+
     # Apply sorting
     assignments = assignments.order_by(sort_field)
     
@@ -149,6 +189,7 @@ def assignment_list(request):
 
     return render(request, 'inventory/assignment_list.html', context)
 
+
 # Single asset details & assignments page
 @permission_required('inventory.view_asset', raise_exception=True)
 def asset_details(request, asset_id):
@@ -157,10 +198,25 @@ def asset_details(request, asset_id):
     """
     asset = get_object_or_404(Asset, id=asset_id)
     active_assignment = asset.assignments.filter(returned_date__isnull=True).first()
-    assignments = asset.assignments.select_related('entra_user').order_by('-assigned_date')
+    assignments = asset.assignments.select_related('entra_user')
 
     # Get sort field from GET parameters, default to '-assigned_date' (newest first)
     sort_field = request.GET.get('sort', '-assigned_date')
+
+    # Only allow sorting by known-safe fields
+    allowed_sort_fields = {
+        'entra_user__upn',
+        '-entra_user__upn',
+        'assigned_date',
+        '-assigned_date',
+        'returned_date',
+        '-returned_date',
+        'location',
+        '-location',
+    }
+
+    if sort_field not in allowed_sort_fields:
+        sort_field = '-assigned_date'
 
     # Apply sorting
     assignments = assignments.order_by(sort_field)
@@ -174,6 +230,7 @@ def asset_details(request, asset_id):
     
     return render(request, 'inventory/asset_details.html', context)
 
+
 # Single user details & assignments page
 @permission_required('inventory.view_entrauser', raise_exception=True)
 def user_assignments(request, user_id):
@@ -181,10 +238,25 @@ def user_assignments(request, user_id):
     Display all assignments for a single user.
     """
     user = get_object_or_404(EntraUser, id=user_id)
-    assignments = user.user_assignments.select_related('asset').order_by('-assigned_date')
+    assignments = user.user_assignments.select_related('asset')
 
     # Get sort field from GET parameters, default to '-assigned_date' (newest first)
     sort_field = request.GET.get('sort', '-assigned_date')
+
+    # Only allow sorting by known-safe fields
+    allowed_sort_fields = {
+        'asset__name',
+        '-asset__name',
+        'assigned_date',
+        '-assigned_date',
+        'returned_date',
+        '-returned_date',
+        'location',
+        '-location',
+    }
+
+    if sort_field not in allowed_sort_fields:
+        sort_field = '-assigned_date'
 
     # Apply sorting
     assignments = assignments.order_by(sort_field)
@@ -196,6 +268,7 @@ def user_assignments(request, user_id):
     }
 
     return render(request, 'inventory/user_assignments.html', context)
+
 
 # All Entra ID users page
 @permission_required('inventory.view_entrauser', raise_exception=True)
@@ -226,6 +299,21 @@ def user_list(request):
     # Get sort field from GET parameters, default to 'display_name'
     sort_field = request.GET.get('sort', 'display_name')
 
+    # Only allow sorting by known-safe fields
+    allowed_sort_fields = {
+        'display_name',
+        '-display_name',
+        'upn',
+        '-upn',
+        'department',
+        '-department',
+        'is_active',
+        '-is_active',
+    }
+
+    if sort_field not in allowed_sort_fields:
+        sort_field = 'display_name'
+
     # Apply sorting
     users = users.order_by(sort_field)
 
@@ -238,6 +326,7 @@ def user_list(request):
     }
 
     return render(request, 'inventory/user_list.html', context)
+
 
 # Add an asset form page
 @permission_required('inventory.add_asset', raise_exception=True)
@@ -260,6 +349,7 @@ def create_asset(request):
     
     return render(request, 'inventory/asset_form.html', {'form': form})
 
+
 # Edit an asset form page
 @permission_required('inventory.change_asset', raise_exception=True)
 def edit_asset(request, asset_id):
@@ -280,6 +370,7 @@ def edit_asset(request, asset_id):
     
     return render(request, 'inventory/asset_form.html', {'form': form, 'edit': True})
 
+
 # Create assignment form page
 @permission_required('inventory.add_assignment', raise_exception=True)
 def create_assignment(request):
@@ -297,6 +388,7 @@ def create_assignment(request):
         form = AssignmentForm(initial=initial)
     
     return render(request, 'inventory/create_assignment.html', {'form': form})
+
 
 # Edit an assignment
 @permission_required('inventory.change_assignment', raise_exception=True)
@@ -317,6 +409,7 @@ def edit_assignment(request, assignment_id):
 
     return render(request, 'inventory/create_assignment.html', {'form': form, 'edit': True})
 
+
 # SSO login logic
 def ms_login(request):
     # Create an MSAL Confidential Client
@@ -332,6 +425,7 @@ def ms_login(request):
         redirect_uri=settings.MICROSOFT_REDIRECT_URI
     )
     return redirect(auth_url)
+
 
 # SSO Callback
 def ms_callback(request):
@@ -378,6 +472,7 @@ def ms_callback(request):
 
     return redirect("/")
 
+
 # SSO logout logic
 def ms_logout(request):
     # Log out from Django
@@ -390,6 +485,7 @@ def ms_logout(request):
     ms_logout_url = f"https://login.microsoftonline.com/{settings.MICROSOFT_TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=http://localhost:8000/login/"
     
     return redirect(ms_logout_url)
+
 
 # Home/Dashboard page
 def home(request):
@@ -415,6 +511,7 @@ def home(request):
 
     return render(request, 'inventory/home.html', context)
 
+
 # Delete asset confirmation page
 @permission_required('inventory.delete_asset', raise_exception=True)
 def asset_delete(request, asset_id):
@@ -425,6 +522,7 @@ def asset_delete(request, asset_id):
         return redirect('asset_list')
 
     return render(request, 'inventory/asset_confirm_delete.html', {'asset': asset})
+
 
 # Management page
 @login_required
